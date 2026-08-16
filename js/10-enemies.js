@@ -30,45 +30,19 @@ const SPAWN_WEIGHTS = {
 /* ================================================================
    СПАВН (п. 2.5)
    ============================================================ */
-
-/* Флаг: был ли уже выполнен первый спавн на текущей ОО */
-let firstSpawnDone = false;
-
 function spawnTick(dt){
   if(!P.moved) return;                 /* монстры ждут первого движения (п. 1.6) */
-  
-  /* Задержка первого спавна после входа в ОО */
-  if(!firstSpawnDone) {
-    G.spawnT -= dt;
-    if(G.spawnT <= 0) {
-      firstSpawnDone = true;
-      G.spawnT = C.respawnT; // сброс таймера на стандартный интервал
-    }
-    return;
-  }
-  
+  G.spawnT -= dt;
   /* очередь респауна */
   for(let i = G.respawnQ.length-1; i >= 0; i--){
     G.respawnQ[i].t -= dt;
     if(G.respawnQ[i].t <= 0){ G.respawnQ.splice(i,1); }
   }
-  
-  G.spawnT -= dt;
   if(G.spawnT > 0) return;
-  
   const alive = G.enemies.filter(function(e){ return !e.dead; }).length;
-  
-  /* Проверка лимитов: popMin..popMax монстров */
-  if(alive < C.popMax && alive >= C.popMin){
-    // Шанс спавна для поддержания среднего значения
-    if(Math.random() < 0.7) {
-      spawnOne(pickType());
-      G.spawnT = C.respawnT;
-    }
-  } else if(alive < C.popMin) {
-    // Срочный спавн если слишком мало врагов
+  if(alive < C.pop){                   /* 5–7 активных монстров (п. 2.5) */
     spawnOne(pickType());
-    G.spawnT = C.respawnT * 0.5;
+    G.spawnT = 1.1;
   }
 }
 
@@ -96,10 +70,10 @@ function spawnOne(type){
     const a = rnd(0, 6.283);
     const d = rnd(oo.ring0 + 260, Math.max(oo.ring0 + 270, oo.ring1 - 100));
     x = Math.cos(a)*d; y = Math.sin(a)*d;
-    /* не спавниться в игроке (п. 1.6) — увеличено до 400px */
-    if(Math.hypot(x - P.x, y - P.y) < 400) continue;
-    /* не спавниться в зоне спавна (п. 1.6) — C.safeR уже 400px */
-    if(Math.hypot(x, y) < C.safeR) continue;
+    /* не спавниться в игроке (п. 1.6) */
+    if(Math.hypot(x - P.x, y - P.y) < 320) continue;
+    /* не спавниться в зоне спавна (п. 1.6) */
+    if(Math.hypot(x, y) < C.safeR + 60) continue;
     /* не спавниться в воде (для Капли — наоборот, в воде) */
     const inW = G.water ? G.water.some(w => Math.hypot(x-w.x, w.y-y) < w.r) : false;
     if(def.water && !inW) continue;
