@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ОО-78 · Область Опасности</title>
+<!-- Иконка (файл добавим позже; пока браузер просто не найдёт её) -->
+<link rel="icon" href="favicon.ico">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="bgFx"></canvas>
+
+<!-- ГЛАВНОЕ МЕНЮ -->
+<div id="scr-menu" class="screen">
+  <div class="menu-grid">
+    <div class="menu-left">
+      <div class="stamp">
+        <div class="stamp-top">ЭАКИ · проект</div>
+        <div class="stamp-code">ОО-78</div>
+        <div class="stripe"></div>
+        <div class="stamp-sub">ОБЛАСТЬ ОПАСНОСТИ</div>
+      </div>
+      <p class="legend">Группа учёных выпустила совершенное творение на экстремальную
+      арену климатических испытаний. Задача объекта — эволюционировать.
+      Докажет ли он, что способен дойти до последней ОО? Покажет лишь время…</p>
+      <div class="menu-btns">
+        <button class="btn primary" id="btnStart">▶&nbsp; НАЧАТЬ ЭВОЛЮЦИЮ</button>
+        <button class="btn" id="btnSettings">НАСТРОЙКИ</button>
+        <button class="btn" id="btnEncy">ЭНЦИКЛОПЕДИЯ</button>
+      </div>
+    </div>
+    <div class="menu-right">
+      <div class="specimen">
+        <canvas id="specCv" width="240" height="240"></canvas>
+        <div class="spec-cap">Образец: <b>Протагон</b> ·
+          статус: <span class="ok">ГОТОВ</span></div>
+      </div>
+      <div class="menu-stats" id="menuStats"></div>
+    </div>
+  </div>
+  <div class="menu-foot">ОО-78 · автосохранение в localStorage</div>
+</div>
+
+<!-- ВЫБОР РЕЖИМА -->
+<div id="scr-mode" class="screen hidden">
+  <div class="scr-title">ВЫБОР РЕЖИМА<small>ЭАКИ · ПРОТОКОЛ ИСПЫТАНИЙ</small></div>
+  <div class="mode-card" id="modeCampaign">
+    <span class="ic">⚑</span>
+    <div><h3>КАМПАНИЯ</h3><p>До края арены, через 32 ОО, к одному из четырёх боссов</p></div>
+    <span class="tag">ДОСТУПНО</span>
+  </div>
+  <div class="mode-card off">
+    <span class="ic">∞</span>
+    <div><h3>БЕСКОНЕЧНЫЙ</h3><p>Выживание без границ арены</p></div>
+    <span class="tag">В РАЗРАБОТКЕ</span>
+  </div>
+  <div class="mode-card off">
+    <span class="ic">⚔</span>
+    <div><h3>МУЛЬТИПЛЕЕР</h3><p>Совместные испытания</p></div>
+    <span class="tag">НЕДОСТУПНО</span>
+  </div>
+  <button class="btn small" id="btnModeBack">◀ Назад</button>
+</div>
+
+<!-- ВЫБОР ПЕРСОНАЖА -->
+<div id="scr-chars" class="screen hidden">
+  <div class="scr-title">ВЫБОР ОБРАЗЦА<small>ЛИСТАЙТЕ ПО КРУГУ · ENTER — В БОЙ</small></div>
+  <div class="car-wrap">
+    <button class="car-arrow" id="carL">◀</button>
+    <div class="car-card">
+      <canvas id="charCv" width="180" height="180"></canvas>
+      <div class="car-name" id="carName"></div>
+      <div class="car-uniq" id="carUniq"></div>
+      <div class="car-stats" id="carStats"></div>
+      <div class="car-lock hidden" id="carLock"></div>
+      <button class="btn primary" id="btnFight">В АРЕНУ</button>
+      <div class="car-dots" id="carDots" style="margin-top:14px"></div>
+    </div>
+    <button class="car-arrow" id="carR">▶</button>
+  </div>
+  <button class="btn small" id="btnCharBack">◀ Назад</button>
+</div>
+
+<!-- НАСТРОЙКИ -->
+<div id="scr-settings" class="screen hidden">
+  <div class="scr-title">НАСТРОЙКИ</div>
+  <div class="panel">
+    <h3>ИГРОВЫЕ СЛОТЫ</h3>
+    <div id="slotList"></div>
+  </div>
+  <div class="panel">
+    <h3>ЗВУК И ПРОЧЕЕ</h3>
+    <div class="vol-row"><span style="width:160px">Общая громкость</span>
+      <input type="range" id="volM" min="0" max="100"></div>
+    <div class="vol-row"><span style="width:160px">Эффекты</span>
+      <input type="range" id="volS" min="0" max="100"></div>
+    <div class="vol-row"><span style="width:160px">Тени живых существ</span>
+      <input type="checkbox" id="shadows" style="flex:0"></div>
+    <div class="vol-row"><span style="width:160px">Индикаторы ловушек</span>
+      <input type="checkbox" id="trapInd" style="flex:0"></div>
+  </div>
+  <button class="btn small" id="btnSetBack">◀ Назад</button>
+</div>
+
+<!-- ЭНЦИКЛОПЕДИЯ -->
+<div id="scr-ency" class="screen hidden">
+  <div class="scr-title">ЭНЦИКЛОПЕДИЯ</div>
+  <div class="panel">
+    <h3>ЛЕГЕНДА</h3>
+    <p class="ency-lore">Проект «ОО-78» — эксперимент по созданию совершенного оружия.
+    Объект выпущен в центр арены радиусом 25000 px, разделённой на 32 области
+    опасности. Четыре первичные ОО — общие: Ромашковые поля, Речные луга,
+    Холмы и Железные горы. Далее — четыре локации по 7 ОО, каждая со своим
+    климатом. Максимальный уровень — 78.</p>
+  </div>
+  <div class="panel">
+    <h3>ДОСТИЖЕНИЯ</h3>
+    <div id="achList"></div>
+  </div>
+  <div class="panel">
+    <h3>АРТЕФАКТЫ</h3>
+    <p class="ency-lore">Бестиарий артефактов появится позже (обычные, редкие,
+    особого назначения и древние). Инвентарь — 8 слотов, активные — Space.</p>
+  </div>
+  <button class="btn small" id="btnEncyBack">◀ Назад</button>
+</div>
+
+<!-- ИГРА -->
+<div id="scr-game" class="screen hidden">
+  <div class="game-wrap">
+    <canvas id="game"></canvas>
+    <div id="toast"></div>
+    <div id="sysMsg"></div>
+    <div id="achToast"></div>
+    <div id="pauseOv" class="overlay hidden">
+      <div class="ov-title" style="color:var(--cyan)">ПАУЗА</div>
+      <div class="row">
+        <button class="btn primary" id="btnResume">Продолжить</button>
+        <button class="btn" id="btnPauseSet">Настройки</button>
+        <button class="btn" id="btnAbort">Покинуть забег</button>
+      </div>
+      <p style="color:var(--dim);font-size:12px">Прогресс забега не сохраняется
+      (автосохранение — только при смерти/победе)</p>
+    </div>
+    <div id="deathOv" class="overlay hidden"></div>
+  </div>
+</div>
+
+<!-- Подключение скриптов: строго по порядку, каждый файл ставит чекпоинт -->
+<script src="js/00-watchdog.js"></script>
+<script src="js/01-config.js"></script>
+<script src="js/02-utils.js"></script>
+<script src="js/03-save.js"></script>
+<script src="js/04-sfx.js"></script>
+<script src="js/05-screens.js"></script>
+<script src="js/06-menufx.js"></script>
+<script src="js/07-draw-hero.js"></script>
+<script src="js/08-state.js"></script>
+<script src="js/09-combat.js"></script>
+<script src="js/10-enemies.js"></script>
+<script src="js/11-terrain.js"></script>
+<script src="js/12-render.js"></script>
+<script src="js/13-boot.js"></script>
+<script src="js/14-patch.js"></script>
+</body>
+</html>
