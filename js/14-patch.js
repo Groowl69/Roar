@@ -167,10 +167,7 @@ function patchGoToOO(n, outward){
   if(outward){ P.x = nx*(inner+80); P.y = ny*(inner+80); }
   else { P.x = nx*(outer-80); P.y = ny*(outer-80); }
   P.vx = 0; P.vy = 0;
-  G.enemies = []; G.respawnQ = []; 
-  G.spawnT = C.firstSpawnDelay;
-  /* Сброс флага первого спавна при перехоте в новую ОО */
-  firstSpawnDone = false;
+  G.enemies = []; G.respawnQ = []; G.spawnT = C.spawnDelay;
   G.cam.x = P.x; G.cam.y = P.y;
   if(typeof toast === 'function') toast('ОО-' + (n+1));
 }

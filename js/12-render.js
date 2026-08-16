@@ -19,12 +19,13 @@ function shade(hex, p){
   return 'rgb(' + f(r) + ',' + f(g) + ',' + f(b) + ')';
 }
 
-/* ---------- фактор ночи (п. 1.10) — использует getLightFactor из 08-state.js ---------- */
+/* ---------- фактор ночи (п. 1.10) ---------- */
 function nightFactor(){
-  // Используем новую функцию getLightFactor для плавного перехода
-  const light = getLightFactor();
-  // Возвращаем коэффициент затемнения: 0 = день, 1 = полная ночь
-  return 1.0 - light;
+  const t = G.dayT, day = C.dayLen, night = C.nightLen;
+  if(t < day - 30) return 0;
+  if(t < day) return (t - (day-30))/30;
+  if(t < day + night - 30) return 1;
+  return 1 - (t - (day+night-30))/30;
 }
 
 /* ---------- отрисовка цветка ---------- */
@@ -578,26 +579,23 @@ function drawHUD(c, nf){
   const full = !!keys['KeyM'];
   drawMinimap(c, full);
   /* день/ночь и погода: верхний правый */
-  const isNightVal = isNight();
-  const lightFactor = getLightFactor();
+  const isNight = G.dayT >= C.dayLen;
   const cyc = G.dayT;
   const mm = Math.floor(cyc/60), ss = Math.floor(cyc%60);
   c.fillStyle = 'rgba(10,16,11,.8)';
   rr(c, cv.width-176, 10, 166, 52, 6); c.fill();
-  c.fillStyle = isNightVal ? '#cfd8ff' : '#ffd76a';
+  c.fillStyle = isNight ? '#cfd8ff' : '#ffd76a';
   c.beginPath(); c.arc(cv.width-156, 28, 8, 0, 7); c.fill();
-  if(isNightVal){
+  if(isNight){
     c.fillStyle = 'rgba(10,16,11,1)';
     c.beginPath(); c.arc(cv.width-152, 25, 7, 0, 7); c.fill();
   }
   c.fillStyle = '#e6efe4'; c.font = 'bold 12px ' + FB; c.textAlign = 'left';
-  c.fillText((isNightVal ? 'Ночь' : 'День') + ' 1 · ' +
+  c.fillText((isNight ? 'Ночь' : 'День') + ' 1 · ' +
     String(mm).padStart(2,'0') + ':' + String(ss).padStart(2,'0'),
     cv.width-140, 32);
   c.fillStyle = '#8fa08f'; c.font = '11px ' + FB;
-  // Отображение фазы освещения в процентах
-  const lightPct = Math.round(lightFactor * 100);
-  c.fillText('Освещение ' + lightPct + '% · ОО-' + (G.terrain ? G.terrain.oo+1 : 1), cv.width-168, 52);
+  c.fillText('Ясно · ОО-' + (G.terrain ? G.terrain.oo+1 : 1), cv.width-168, 52);
   /* эффекты */
   let effY = 70;
   const eff = [];

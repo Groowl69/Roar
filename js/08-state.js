@@ -25,20 +25,6 @@ function ooCap(){
 /* Опыт, нужный для перехода с уровня l на уровень l+1 */
 function needXp(l){ return 40 + 15*(l-1); }
 
-/* Определение: сейчас ночь? (true/false) */
-function isNight(){
-  return G.dayT >= C.dayLen;
-}
-
-/* Коэффициент освещения: 1.0 = день, nightOpacity = ночь */
-function getLightFactor(){
-  if(G.dayT < C.dayLen) return 1.0; // полный день
-  const nightProgress = (G.dayT - C.dayLen) / C.nightLen; // 0..1 в течение ночи
-  // Плавный переход: сумерки в начале и конце ночи
-  if(nightProgress < 0.1) return 1.0 - (1.0 - C.nightOpacity) * (nightProgress / 0.1);
-  if(nightProgress > 0.9) return C.nightOpacity + (1.0 - C.nightOpacity) * ((1.0 - nightProgress) / 0.1);
-  return C.nightOpacity; // полная ночь
-}
 
 /* Пересчёт характеристик игрока по вложенным очкам прокачки.
    Формулы п. 3.1 (базы Протагона). Вызывается при старте и
@@ -89,7 +75,7 @@ function startRun(){
     t:0, dayT:0, cam:{x:0, y:0}, shake:0,
     curOO:0, visited:[true,false,false,false],
     ooGot:[0,0,0,0], ooData:[null,null,null,null],
-    enemies:[], respawnQ:[], spawnT:C.firstSpawnDelay,
+    enemies:[], respawnQ:[], spawnT:C.spawnDelay,
     xpPts:[], deco:[], ash:[],
     particles:[], floats:[], pillars:[],
     garden:null, gardenSeen:false,
@@ -98,8 +84,6 @@ function startRun(){
     mx:cv.width/2, my:cv.height/2, wmx:0, wmy:0, mdown:false,
     pillCd:0, hold5:0, devT:0,
   };
-  /* Сброс флага первого спавна при старте забега */
-  firstSpawnDone = false;
   initWorld();   /* генерация ландшафта — в 11-terrain.js */
   paused = false;
   $('pauseOv').classList.add('hidden');
@@ -151,7 +135,7 @@ function update(rdt){
   P.block = !!keys['ShiftLeft'] || !!keys['ShiftRight'];
   const moving = ix !== 0 || iy !== 0;
   if(moving){
-    if(!P.moved){ P.moved = true; G.spawnT = C.firstSpawnDelay; }
+    if(!P.moved){ P.moved = true; G.spawnT = C.spawnDelay; }
     P.lastMoveT = G.t;
     const il = Math.hypot(ix, iy);
     ix /= il; iy /= il;
